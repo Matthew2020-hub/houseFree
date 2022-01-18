@@ -17,7 +17,7 @@ import environ
 
 env = environ.Env()
 # reading .env file
-environ.Env.read_env('.env')
+environ.Env.read_env('freeHouse.env')
 
 # Raises django's ImproperlyConfigured exception if SECRET_KEY not in os.environ
 SECRET_KEY = env("SECRET_KEY")
