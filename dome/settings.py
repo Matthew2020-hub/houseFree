@@ -12,8 +12,11 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from pathlib import Path
 import os
-
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 import environ
+from decouple import config
 
 env = environ.Env()
 # reading .env file
@@ -32,6 +35,15 @@ DATABASES = {
         'PORT': env("DATABASE_PORT"),
     }
 }
+cloudinary.config( 
+  cloud_name=env("CLOUD_NAME"), 
+  api_key=env("API_KEY"), 
+  api_secret=env("API_SECRET"),
+  secure = True
+)
+
+CLOUDINARY_URL="cloudinary://313926842933816:DSBYok2TOrxqZjMKrEp8nNM_OcA@housefree"
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -43,7 +55,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECRET_KEY = 'django-insecure-0srq8vs)x)=#z5)wpj3h*mnwn&1%zk&#bci^_ftv#0io#sv5t7'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['house-free.herokuapp.com', '127.0.0.1']
 
@@ -58,6 +70,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'cloudinary',
+    'cloudinary_storage',
     'apartment',
 ]
 
@@ -96,17 +110,6 @@ WSGI_APPLICATION = 'dome.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#     'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#     'NAME': 'postgres',
-#     'USER': 'postgres',
-#     'PASSWORD': '1998',
-#     'HOST': 'localhost',
-#     'PORT': '',
-#     }
-# }
-
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
 
@@ -143,9 +146,12 @@ USE_TZ = True
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+

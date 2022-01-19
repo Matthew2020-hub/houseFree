@@ -9,4 +9,4 @@ class ApartmentSerializer(serializers.ModelSerializer):
         super(ApartmentSerializer, self).__init__(*args, **kwargs)
     class Meta:
         model = Apartment
-        fields = ['apartment_id', 'name','category', 'price', 'location', 'agent']
+        fields = ['apartment_id', 'name','category', 'image', 'price', 'location', 'agent']
