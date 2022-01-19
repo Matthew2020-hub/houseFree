@@ -5,3 +5,6 @@
 __pycache__
 db.sqlite3
 freeHouse.env
+local_settings.py
+/media
+local.env
