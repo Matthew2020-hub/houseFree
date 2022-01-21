@@ -44,6 +44,19 @@ cloudinary.config(
 
 CLOUDINARY_URL="cloudinary://313926842933816:DSBYok2TOrxqZjMKrEp8nNM_OcA@housefree"
 
+
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',  
+    ),
+    'DEFAULT_PERMISSIONS_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -55,7 +68,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECRET_KEY = 'django-insecure-0srq8vs)x)=#z5)wpj3h*mnwn&1%zk&#bci^_ftv#0io#sv5t7'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['house-free.herokuapp.com', '127.0.0.1']
 
@@ -73,8 +86,19 @@ INSTALLED_APPS = [
     'cloudinary',
     'cloudinary_storage',
     'apartment',
+    'rest_framework.authtoken',
+    'django.contrib.sites',
+    'rest_auth',
+    'allauth',
+    'django_countries',
+    'allauth.account',
+    'rest_auth.registration',
+    'userAuthentication',
 ]
 
+REST_AUTH_SERIALIZERS = {
+    'USER_DETAILS_SERIALIZER': 'users.serializers.UserSerializer',
+}
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -87,6 +111,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'dome.urls'
+
+AUTH_USER_MODEL = 'userAuthentication.CustomUser'
 
 TEMPLATES = [
     {
@@ -128,6 +154,18 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/?verification=1'
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/?verification=1'
+
+SITE_ID = 1
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/

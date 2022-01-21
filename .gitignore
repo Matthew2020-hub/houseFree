@@ -164,8 +164,8 @@ cython_debug/
 *.pot
 *.pyc
 __pycache__
-db.sqlite3
 freeHouse.env
+db.sqlite3
 local_settings.py
 /media
 local.env
