@@ -94,10 +94,11 @@ INSTALLED_APPS = [
     'allauth.account',
     'rest_auth.registration',
     'userAuthentication',
+    'transaction',
 ]
 
 REST_AUTH_SERIALIZERS = {
-    'USER_DETAILS_SERIALIZER': 'users.serializers.UserSerializer',
+    'USER_DETAILS_SERIALIZER': 'userAuthentication.serializers.UserSerializer',
 }
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
