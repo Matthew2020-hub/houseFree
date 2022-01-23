@@ -169,3 +169,7 @@ db.sqlite3
 local_settings.py
 /media
 local.env
+
+# ignoring housefree_38
+# virtual env used to separate different django versions
+housefree_38
