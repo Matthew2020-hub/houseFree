@@ -165,6 +165,7 @@ cython_debug/
 *.pyc
 __pycache__
 freeHouse.env
+transaction.env
 db.sqlite3
 local_settings.py
 /media
