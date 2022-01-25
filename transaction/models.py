@@ -9,3 +9,7 @@ class Payment(models.Model):
     phone = models.CharField(max_length=12, unique=True, blank=False, verbose_name='phone number')
     date_created = models.DateTimeField(auto_now_add=True)
     amount = models.CharField(max_length=20, blank=False)
+
+
+# class Agent_wallet(models.Model):
+#     agent_id = 

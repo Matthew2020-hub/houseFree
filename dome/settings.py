@@ -93,6 +93,7 @@ INSTALLED_APPS = [
     'django_countries',
     'allauth.account',
     'rest_auth.registration',
+    'allauth.socialaccount',
     'userAuthentication',
     'transaction',
 ]
@@ -114,6 +115,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'dome.urls'
 
 AUTH_USER_MODEL = 'userAuthentication.CustomUser'
+# AUTH_AGENT_MODEL = 'userAuthenticatin.Agent_info'
 
 TEMPLATES = [
     {

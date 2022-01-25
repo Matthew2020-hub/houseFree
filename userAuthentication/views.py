@@ -17,22 +17,30 @@ from rest_framework.authentication import BasicAuthentication, SessionAuthentica
 from rest_framework.permissions import IsAuthenticated
 
 
+# api/views.py
+from rest_framework import generics
 
 
-
-class CreateListAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins.CreateModelMixin):
-    serializer_class = UserSerializer
+class ListTodo(generics.CreateAPIView):
     queryset = CustomUser.objects.all()
-    lookup_field = 'user_id'
-    authentication_classes = [TokenAuthentication]
-    permisssion_classes = [IsAuthenticated]
-
-    def get(self, request):
-        check = CustomUser.objects.all()
-        return self.list(check)
-
+    serializer_class = UserSerializer
     def post(self, request):
         return self.create(request)
+
+# class CreateListAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins.CreateModelMixin):
+#     serializer_class = UserSerializer
+  
+#     lookup_field = 'user_id'
+#     authentication_classes = [TokenAuthentication]
+#     permisssion_classes = [IsAuthenticated]
+
+    # def get(self, request, user_id, **kwargs):
+    #     instance = self.get_object()
+    #     serializer = self.get_serializer(instance)
+    #     return Response(serializer.data)
+
+    # def post(self, request):
+    #     return self.create(request)
 
 class CreateUpdateDestroyAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin):
     serializer_class = UserSerializer
@@ -41,11 +49,9 @@ class CreateUpdateDestroyAPIView(generics.GenericAPIView, mixins.ListModelMixin,
     authentication_classes = [TokenAuthentication]
     permisssion_classes = [IsAuthenticated]
 
-    def get(self, request, user_id):
-
-        queryset = CustomUser.objects.filter(user_id = user_id)
-        article = get_object_or_404(queryset)
-        serializer = UserSerializer(article)
+    def get1(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
     def put(self, request, user_id):

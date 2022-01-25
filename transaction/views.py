@@ -11,7 +11,7 @@ import environ
 # Initialise environment variables
 
 @api_view(['GET', 'POST'])
-def make_payment(request):
+def make_payment(name, email, amount, phone):
     env = environ.Env()
     environ.Env.read_env('transaction.env')
     serializer = PaymentSerializer
@@ -19,7 +19,7 @@ def make_payment(request):
     hed = {'Authorization': 'Bearer ' + auth_token}
     data = {
                 "tx_ref":''+str(randint(111111,999999)),
-                "amount":'30,000',
+                "amount":amount,
                 "currency":"NGN",
                 "redirect_url":"http://localhost:8000/callback",
                 "payment_options":"card",
@@ -28,9 +28,9 @@ def make_payment(request):
                     "consumer_mac":"92a3-912ba-1192a"
                 },
                 "customer":{
-                    "email":'akin@gmail.com',
-                    "phonenumber":'0912345679',
-                    "name":'tolu'
+                    "email":email,
+                    "phonenumber":phone,
+                    "name":name
                 },
                 "customizations":{
                     "title":"Supa houseFree",
