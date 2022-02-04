@@ -23,8 +23,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('apartment.urls')),
     path('', include('userAuthentication.urls')),
-    # path('api-auth/', include('rest_framework.urls')),
+    path('api/v1/auth', include('rest_framework_social_oauth2.urls')),
+    path('accounts/', include('allauth.urls')),
     path('rest-auth/registration/', include('rest_auth.registration.urls')),
-    # path('auth/', include('rest_auth.urls')),
     path('', include('transaction.urls')),
+    path('', include('agentAuthentication.urls')),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

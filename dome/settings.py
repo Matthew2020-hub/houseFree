@@ -11,12 +11,19 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+
 import os
+from pickle import TRUE
+from tkinter.tix import Tree
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
+from django.shortcuts import redirect
 import environ
 from decouple import config
+import os
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dome.settings")
+os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
 env = environ.Env()
 # reading .env file
@@ -24,7 +31,7 @@ environ.Env.read_env('freeHouse.env')
 
 # Raises django's ImproperlyConfigured exception if SECRET_KEY not in os.environ
 SECRET_KEY = env("SECRET_KEY")
-
+FLUTTERWAVE_KEY=env("FLUTTERWAVE_KEY")
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -41,11 +48,33 @@ cloudinary.config(
   api_secret=env("API_SECRET"),
   secure = True
 )
-
+SECRET_KEY = os.environ.get('DJANGO_KEY')
 CLOUDINARY_URL="cloudinary://313926842933816:DSBYok2TOrxqZjMKrEp8nNM_OcA@housefree"
 
+# Facebook configuration
 
+SOCIAL_AUTH_GOOGLE_KEY = env('GOOGLE_CLIENT_ID')
+SOCIAL_AUTH_GOOGLE_SECRET = env('GOOGLE_CLIENT_KEY')
+redirect_uri = env('redirect_uri')
+project_id = env('project_id')
 
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
+
+# Define SOCIAL_AUTH_FACEBOOK_SCOPE to get extra permissions from facebook. Email is not sent by default, to get it, you must request the email permission:
+FACEBOOK_EXTENDED_PERMISSIONS = ['email']
+SOCIAL_AUTH_ADMIN_USER_SEARCH_FIELDS = ['username', 'first_name', 'email']
+SOCIAL_AUTH_USERNAME_IS_FULL_EMAIL = True
+SOCIAL_AUTH_PIPELINE = (
+'social_core.pipeline.social_auth.social_details',
+'social_core.pipeline.social_auth.social_uid',
+'social_core.pipeline.social_auth.auth_allowed',
+'social_core.pipeline.social_auth.social_user',
+'social_core.pipeline.user.get_username',
+'social_core.pipeline.social_auth.associate_by_email',
+'social_core.pipeline.user.create_user',
+'social_core.pipeline.social_auth.associate_user',
+'social_core.pipeline.social_auth.load_extra_data',
+'social_core.pipeline.user.user_details', )
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -70,8 +99,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['house-free.herokuapp.com', '127.0.0.1']
-
+ALLOWED_HOSTS = ['house-free.herokuapp.com', '127.0.0.1', 'localhost']
 
 # Application definition
 
@@ -90,17 +118,30 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'rest_auth',
     'allauth',
+    'social_django',
+    'oauth2_provider',
     'django_countries',
     'allauth.account',
     'rest_auth.registration',
     'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'corsheaders',
     'userAuthentication',
     'transaction',
+    'agentAuthentication',
 ]
 
 REST_AUTH_SERIALIZERS = {
     'USER_DETAILS_SERIALIZER': 'userAuthentication.serializers.UserSerializer',
+    'AGENT_DETAILS_SERIALIZER': 'agentAuthentication.serializers.AgentSerializer',
+    'LOGIN_SERIALIZER': 'userAuthentication.serializers.LoginUserSerializer',
 }
+
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.google.GoogleOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -110,17 +151,20 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'dome.urls'
 
 AUTH_USER_MODEL = 'userAuthentication.CustomUser'
+AUTH_AGENT_MODEL = 'agentAuthentication.Agent'
 # AUTH_AGENT_MODEL = 'userAuthenticatin.Agent_info'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR/'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -181,7 +225,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
@@ -196,3 +239,8 @@ MEDIA_URL = '/media/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
+# CorsHeaders configuration
+CORS_ORIGIN_ALLOW_ALL =True
+CORS_ALLOW_CREDENTIALS =True
+from django.urls import reverse_lazy
+LOGIN_URL = reverse_lazy('agent-login')

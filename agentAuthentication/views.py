@@ -1,15 +1,17 @@
+from django.shortcuts import render
+from django.urls import reverse_lazy
+# Create your views here.
 from http.client import responses
 from lib2to3.pgen2 import token
-from multiprocessing import AuthenticationError
 from os import access
 import re
 from django.forms import ValidationError
 from django.http import request, response
 from django.http.response import JsonResponse
 from django.shortcuts import render
-from .serializers import (UserSerializer,LoginUserSerializer, GetAcessTokenSerializer,
+from .serializers import (AgentSerializer,AgentLoginSerializer, GetAcessTokenSerializer,
 CustomPasswordResetSerializer, SocialSerializer)
-from .models import CustomUser
+from .models import Agent
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers, viewsets
 from rest_framework.response import Response
@@ -35,47 +37,48 @@ from rest_framework.response import Response
 import requests
 from rest_framework.exceptions import AuthenticationFailed
 import jwt, datetime
-from django.utils.http import unquote
+from urllib.parse import unquote
+import urllib.parse
 
 """An endpoint to crreate user and to GET list of all users"""
 class CreateListAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins.CreateModelMixin):
-    serializer_class = UserSerializer
-    queryset = CustomUser.objects.all()
+    serializer_class = AgentSerializer
+    queryset = Agent.objects.all()
     lookup_field = 'email'
     authentication_classes = [TokenAuthentication]
     permisssion_classes = [IsAuthenticated]
     def get(self, request):
-        check = CustomUser.objects.all()
+        check = Agent.objects.all()
         return self.list(check)
     def post(self, request):
         return self.create(request)
 
 """An endpoint to GET a specific user, Update user info and delete a user's record"""
 class CreateUpdateDestroyAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin):
-    serializer_class = UserSerializer
-    queryset = CustomUser.objects.all()
+    serializer_class = AgentSerializer
+    queryset = Agent.objects.all()
     lookup_field = 'user_id'
     authentication_classes = [TokenAuthentication]
     permisssion_classes = [IsAuthenticated]
     def get(self, request, user_id):
-        queryset = CustomUser.objects.filter(user_id = user_id)
+        queryset = Agent.objects.filter(user_id = user_id)
         article = get_object_or_404(queryset)
-        serializer = UserSerializer(article)
+        serializer = AgentSerializer(article)
         return Response(serializer.data)
     def put(self, request, user_id):
-        query = CustomUser.objects.filter(user_id=user_id)
+        query = Agent.objects.filter(user_id=user_id)
         if query:
             return self.update(request)
         return Response(status=status.HTTP_401_UNAUTHORIZED)
     def delete(self, request, user_id):
-        query = CustomUser.objects.get(apartment_id=user_id)
+        query = Agent.objects.get(apartment_id=user_id)
         if query:
             return self.destroy(request)
 
 """A Custom Password reset view"""
 class CreateUpdateAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins.UpdateModelMixin):
     serializer_class = CustomPasswordResetSerializer
-    queryset = CustomUser.objects.all()
+    queryset = Agent.objects.all()
     lookup_field = 'user_id'
     authentication_classes = [TokenAuthentication]
     permisssion_classes = [IsAuthenticated]
@@ -86,22 +89,22 @@ class CreateUpdateAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins
             phone_number = serializer.validated_data['phone_number']
             password = serializer.validated_data['password']
             print(password)
-            query = CustomUser.objects.filter(email=email, phone_number=phone_number)
+            query = Agent.objects.filter(email=email, phone_number=phone_number)
             if query:
                 print(password)
                 return self.update(request)
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 """
-Handling User's Login with Google session with JWT and setting cookies
+Handling Agent's Login with Google session with JWT and setting cookies
 """
 class SetLoginView(APIView):
         def post(self, request):
             try:
-                serializer = LoginUserSerializer(data=request.data)
+                serializer = AgentLoginSerializer(data=request.data)
                 if serializer.is_valid(raise_exception=True):
                     email = serializer.validated_data['email']
                     password = serializer.validated_data['password']
-                    queryset = CustomUser.objects.get(email=email)
+                    queryset = AgentLoginSerializer.objects.get(email=email)
                     if not queryset.check_password(password):
                         raise AuthenticationFailed("Incorrect Password")
                     elif queryset is None:
@@ -118,7 +121,7 @@ class SetLoginView(APIView):
                         'jwt': token
                     }           
                 return response
-            except CustomUser.DoesNotExist:
+            except Agent.DoesNotExist:
                 return Response({"error": _("User with this email does not exist!")}, status=status.HTTP_404_NOT_FOUND)
 """
 Handling the login view with Cookies and JWT decoding
@@ -132,24 +135,20 @@ class CookiesLoginView(APIView):
             payload = jwt.decode(token, 'secret', algorithms='HS256')
         except jwt.ExpiredSignatureError:
             raise AuthenticationFailed('Unauthenticated')
-        user = CustomUser.objects.filter(email=payload['user']).first()
-        serializer = UserSerializer(user)
+        user = Agent.objects.filter(email=payload['user']).first()
+        serializer = Agent(user)
         return Response(serializer.data, status = status.HTTP_200_OK)
 
 @api_view(['POST'])
 def validate_authorization_code(request):
     serializer = GetAcessTokenSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
-        code = serializer.validated_data['code']
-        uncoded = unquote(code)
-        # coder = code.split()
-        # decode = coder[0:5].pop().insert[0:1, '/']
-        # uncoded = ''.join(decode)
-        if code  is None:
+        authorization_code = unquote(serializer.validated_data['code'])
+        if authorization_code  is None:
             return Response({"message": "Error occured due to Invalid authorization code"}, status=status.HTTP_204_NO_CONTENT)
         data = {
-                'code': uncoded ,
-                'project_id': project_id,
+                'code': authorization_code ,
+                'project_id': '769823704050',
                 'client_id': SOCIAL_AUTH_GOOGLE_KEY,
                 'client_secret': SOCIAL_AUTH_GOOGLE_SECRET,
                 'redirect_uri': redirect_uri,
@@ -160,37 +159,21 @@ def validate_authorization_code(request):
         if not response.ok:
             return Response({'message':'Failed to obtain access token from Google'}, status=status.HTTP_400_BAD_REQUEST)
         access_token = response.json()['access_token']
-        response = requests.get(
-        'https://www.googleapis.com/oauth2/v3/userinfo',
-        params={'access_token': access_token}
-    )
-    print(response)
-    if not response.ok:
-        raise ValidationError('Failed to obtain user info from Google.')
-    result = response.json()
-    login = CustomUser.objects.get(email=result['email'])
-    if login is None:
-        raise AuthenticationError("U ser with this email doesn't exist, kindly sign up")
-    return Response(result, status=status.HTTP_200_OK)
-
+        return Response(access_token, status=status.HTTP_200_OK)
 
 @api_view(['GET', 'POST'])
-def google_get_user_info(request):
-    pass
-    # access_token = request.session.get('access_token')
-    # print(access_token)
-   
-    # serializer = SocialSerializer(data=request.data)
-    # if serializer.is_valid(raise_exception=True):
-        # access_token = serializer.validated_data['access_token']
-        # response = requests.get(
-        #     'https://www.googleapis.com/oauth2/v3/userinfo',
-        #     params={'access_token': access_token}
-        # )
-        # if not response.ok:
-        #     raise ValidationError('Failed to obtain user info from Google.')
-        # result = response.json()
-        # return Response(result, status=status.HTTP_200_OK)
+def google_get_agent_info(request):
+    serializer = SocialSerializer(data=request.data)
+    if serializer.is_valid(raise_exception=True):
+        access_token = serializer.validated_data['access_token']
+        response = requests.get(
+            'https://www.googleapis.com/oauth2/v3/userinfo',
+            params={'access_token': access_token}
+        )
+        if not response.ok:
+            raise ValidationError('Failed to obtain user info from Google.')
+        result = response.json()
+        return Response(result, status=status.HTTP_200_OK)
 
 """A manaual or Custom login and logout View without cookies.
 N.B: This is login view when user signs in manually, i.e., without google authentication
@@ -198,21 +181,21 @@ N.B: This is login view when user signs in manually, i.e., without google authen
 class Login(RestLoginView):
     authentication_classes = [TokenAuthentication]
     permisssion_classes = [IsAuthenticated]
-    serializer_class = LoginUserSerializer
+    serializer_class = AgentLoginSerializer
     def post(self, request, *args, **kwargs):
         try:
-            serializer = LoginUserSerializer(data=request.data)
+            serializer = AgentLoginSerializer(data=request.data)
             if serializer.is_valid(raise_exception=True):
                 email = serializer.validated_data['email']
                 password = serializer.validated_data['password']
-                queryset = CustomUser.objects.get(email=email)
+                queryset = Agent.objects.get(email=email)
                 if not queryset.check_password(password):
                     raise AuthenticationFailed("Incorrect Password")
                 elif queryset is None: 
                     raise AuthenticationFailed("User not found")        
                 return Response( status=status.HTTP_200_OK)  
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except CustomUser.DoesNotExist:
+        except Agent.DoesNotExist:
             return Response({"error": _("User with this email does not exist!")}, status=status.HTTP_404_NOT_FOUND)
 
 @api_view(["GET"])
@@ -222,7 +205,7 @@ def logout(request):
         logout(request)
         return Response({"success": _("Successfully logged out.")},
                     status=status.HTTP_200_OK)
-    except (AttributeError, CustomUser.DoesNotExist):
+    except (AttributeError, Agent.DoesNotExist):
         return Response ({"Error": _("User not found, enter a valid token.")},
         status=status.HTTP_404_NOT_FOUND)
 class LogoutView(APIView):

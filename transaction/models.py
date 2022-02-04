@@ -1,6 +1,10 @@
 from cmath import phase
 import email
+from email.policy import default
+from django.conf import settings
 from django.db import models
+from dome.settings import AUTH_AGENT_MODEL  
+from .validators import minimum_amount
 
 # Create your models here.
 class Payment(models.Model):
@@ -8,8 +12,13 @@ class Payment(models.Model):
     email = models.EmailField(unique=True, verbose_name='email', blank=False)
     phone = models.CharField(max_length=12, unique=True, blank=False, verbose_name='phone number')
     date_created = models.DateTimeField(auto_now_add=True)
-    amount = models.CharField(max_length=20, blank=False)
+    amount = models.CharField(max_length=40, blank=False)
+    agent_account_number = models.CharField(max_length=150, blank=False)
 
 
-# class Agent_wallet(models.Model):
-#     agent_id = 
+class Wallet(models.Model):
+    user = models.OneToOneField(AUTH_AGENT_MODEL, on_delete=models.CASCADE)
+    balance = models.FloatField(default=0, validators=[minimum_amount, ])
+
+    def __str__(self):
+        return f"{self.user.email}'s Wallet"
