@@ -10,15 +10,14 @@ CreateUpdateDestroyAPIView,CreateUpdateAPIView, LogoutView, SetLoginView, Cookie
 from dome.settings import AUTHENTICATION_BACKENDS
 
 urlpatterns = [
-    path('rest-auth/registration/', CreateListAPIView.as_view()),
-    path('user/login/', Login.as_view()),
-    path('user/', SetLoginView.as_view()),
-    path('user/logout/', LogoutView.as_view()),
-    path('cookies/', CookiesLoginView.as_view()),
-    path('token/', views.validate_authorization_code, name="code_validation"),
-    path( 'user-info/', views.google_get_user_info, name="socialilogin"),
+    path('api/v1/user/registration/', CreateListAPIView.as_view()),
+    path('api/v1/user/login/', Login.as_view()),
+    path('api/v1/user/jwt-login/', SetLoginView.as_view()),
+    path('api/v1/user/logout/', LogoutView.as_view()),
+    path('api/v1/user/cookies/', CookiesLoginView.as_view()),
+    path('api/v1/user/access-token/', views.validate_authorization_code, name="code_validation"),
     path('rest-auth/logout/', views.logout, name="logout"),
-    path('soc/', include('rest_framework_social_oauth2.urls')),
+    # path('soc/', include('rest_framework_social_oauth2.urls')),
     path('rest-auth/forget_password/<uuid:user_id>', CreateUpdateAPIView.as_view()),
     path('rest-auth/registration/<uuid:user_id>', CreateUpdateDestroyAPIView.as_view()),
     path('', include('rest_auth.urls')),

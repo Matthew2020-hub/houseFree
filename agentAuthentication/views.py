@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.urls import reverse_lazy
 # Create your views here.
 from http.client import responses
+from multiprocessing import AuthenticationError
 from lib2to3.pgen2 import token
 from os import access
 import re
@@ -144,37 +145,35 @@ class CookiesLoginView(APIView):
 def validate_authorization_code(request):
     serializer = GetAcessTokenSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
-        authorization_code = unquote(serializer.validated_data['code'])
-        if authorization_code  is None:
+        code = serializer.validated_data['code']
+        uncoded = unquote(code)
+        if code  is None:
             return Response({"message": "Error occured due to Invalid authorization code"}, status=status.HTTP_204_NO_CONTENT)
         data = {
-                'code': authorization_code ,
-                'project_id': '769823704050',
+                'code': uncoded ,
+                'project_id': project_id,
                 'client_id': SOCIAL_AUTH_GOOGLE_KEY,
                 'client_secret': SOCIAL_AUTH_GOOGLE_SECRET,
                 'redirect_uri': redirect_uri,
                 'grant_type': 'authorization_code'
         }
         response = requests.post('https://oauth2.googleapis.com/token', data=data)
-        print(data)
         if not response.ok:
             return Response({'message':'Failed to obtain access token from Google'}, status=status.HTTP_400_BAD_REQUEST)
         access_token = response.json()['access_token']
-        return Response(access_token, status=status.HTTP_200_OK)
-
-@api_view(['GET', 'POST'])
-def google_get_agent_info(request):
-    serializer = SocialSerializer(data=request.data)
-    if serializer.is_valid(raise_exception=True):
-        access_token = serializer.validated_data['access_token']
         response = requests.get(
-            'https://www.googleapis.com/oauth2/v3/userinfo',
-            params={'access_token': access_token}
-        )
-        if not response.ok:
-            raise ValidationError('Failed to obtain user info from Google.')
-        result = response.json()
-        return Response(result, status=status.HTTP_200_OK)
+        'https://www.googleapis.com/oauth2/v3/userinfo',
+        params={'access_token': access_token}
+    )
+    if not response.ok:
+        raise ValidationError('Failed to obtain user info from Google.')
+    result = response.json()
+    login = User.objects.get(email=result['email'])
+    if login is None:
+        raise AuthenticationError("User with this email doesn't exist, kindly sign up")
+    return Response(result, status=status.HTTP_200_OK)
+
+
 
 """A manaual or Custom login and logout View without cookies.
 N.B: This is login view when user signs in manually, i.e., without google authentication
