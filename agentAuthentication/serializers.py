@@ -4,39 +4,38 @@ from django.shortcuts import redirect
 from .models import Agent
 import requests
 from rest_framework import serializers
-
+from django_countries.fields import CountryField
 from rest_auth.serializers import PasswordResetSerializer
+from userAuthentication.models import User
 
 class AgentSerializer(serializers.ModelSerializer):
-    
     password2 = serializers.CharField(style={'input_type':'password'}, write_only=True)
+    # entry = serializers.ChoiceField(choices='tenant')
     class Meta:
-        model = Agent
-        fields =  ['user_id', 'email', 'first_name', 'last_name', 'home_address',
-          'country', 'phone_number', 'password', 'password2']
+        model = User
+        fields = ['email', 'entry', 'password', 'first_name', 'last_name', 'country', 'password2', 'phone_number', 'home_address', 'user_id']
         extra_kwargs = {
             'password2': {
                 'write_only':True
-            }
+            },
         }
     def save(self):
-        user = Agent(
+        user = User(
             email=self.validated_data['email'],
             first_name=self.validated_data['first_name'],
-            last_name=self.validated_data['first_name'],
-            home_address=self.validated_data['home_address'],
+            last_name=self.validated_data['last_name'],
             country=self.validated_data['country'],
-            phone_number=self.validated_data['phone_number'],
-            password = self.validated_data['password'],
+            phone_number=self.validated_data['phone_number'], 
+            home_address=self.validated_data['home_address'],     
         )
         password = self.validated_data['password']
         password2 = self.validated_data['password2']
         if password != password2:
             raise serializers.ValidationError({'password':'Passwords must match.'})
         user.set_password(password)
+        user.entry = 'Agent'
         user.save()
-        return user
-
+        return user 
 
 
 class AgentLoginSerializer(serializers.Serializer):

@@ -7,9 +7,9 @@ from django.forms import ValidationError
 from django.http import request, response
 from django.http.response import JsonResponse
 from django.shortcuts import render
-from .serializers import (UserSerializer,LoginUserSerializer, GetAcessTokenSerializer,
-CustomPasswordResetSerializer, SocialSerializer)
-from .models import CustomUser
+from .serializers import (LoginUserSerializer, GetAcessTokenSerializer,
+CustomPasswordResetSerializer, SocialSerializer, CustomUserSerializer)
+from .models import User
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers, viewsets
 from rest_framework.response import Response
@@ -17,7 +17,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework import generics
 from rest_framework import mixins
-from rest_framework.authentication import BasicAuthentication, SessionAuthentication, TokenAuthentication
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import generics
@@ -39,43 +39,43 @@ from django.utils.http import unquote
 
 """An endpoint to crreate user and to GET list of all users"""
 class CreateListAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins.CreateModelMixin):
-    serializer_class = UserSerializer
-    queryset = CustomUser.objects.all()
+    serializer_class = CustomUserSerializer
+    queryset = User.objects.filter(entry='Tenant')
     lookup_field = 'email'
     authentication_classes = [TokenAuthentication]
     permisssion_classes = [IsAuthenticated]
     def get(self, request):
-        check = CustomUser.objects.all()
+        check = User.objects.filter(entry='Tenant')
         return self.list(check)
     def post(self, request):
         return self.create(request)
 
 """An endpoint to GET a specific user, Update user info and delete a user's record"""
 class CreateUpdateDestroyAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin):
-    serializer_class = UserSerializer
-    queryset = CustomUser.objects.all()
+    serializer_class =CustomUserSerializer
+    queryset =User.objects.filter(entry='Tenant')
     lookup_field = 'user_id'
     authentication_classes = [TokenAuthentication]
     permisssion_classes = [IsAuthenticated]
     def get(self, request, user_id):
-        queryset = CustomUser.objects.filter(user_id = user_id)
+        queryset = User.objects.filter(user_id = user_id)
         article = get_object_or_404(queryset)
-        serializer = UserSerializer(article)
+        serializer = CustomUserSerializer(article)
         return Response(serializer.data)
     def put(self, request, user_id):
-        query = CustomUser.objects.filter(user_id=user_id)
+        query = User.objects.filter(user_id=user_id)
         if query:
             return self.update(request)
         return Response(status=status.HTTP_401_UNAUTHORIZED)
     def delete(self, request, user_id):
-        query = CustomUser.objects.get(apartment_id=user_id)
+        query = User.objects.get(apartment_id=user_id)
         if query:
             return self.destroy(request)
 
 """A Custom Password reset view"""
 class CreateUpdateAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins.UpdateModelMixin):
     serializer_class = CustomPasswordResetSerializer
-    queryset = CustomUser.objects.all()
+    queryset = User.objects.filter(entry='Tenant')
     lookup_field = 'user_id'
     authentication_classes = [TokenAuthentication]
     permisssion_classes = [IsAuthenticated]
@@ -86,7 +86,8 @@ class CreateUpdateAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins
             phone_number = serializer.validated_data['phone_number']
             password = serializer.validated_data['password']
             print(password)
-            query = CustomUser.objects.filter(email=email, phone_number=phone_number)
+            queryset = User.objects.filter(entry='Tenant')
+            query = queryset.filter(email=email, phone_number=phone_number)
             if query:
                 print(password)
                 return self.update(request)
@@ -101,7 +102,8 @@ class SetLoginView(APIView):
                 if serializer.is_valid(raise_exception=True):
                     email = serializer.validated_data['email']
                     password = serializer.validated_data['password']
-                    queryset = CustomUser.objects.get(email=email)
+                    query = User.objects.filter(entry='Tenant')
+                    queryset = query.objects.get(email=email)
                     if not queryset.check_password(password):
                         raise AuthenticationFailed("Incorrect Password")
                     elif queryset is None:
@@ -118,7 +120,7 @@ class SetLoginView(APIView):
                         'jwt': token
                     }           
                 return response
-            except CustomUser.DoesNotExist:
+            except User.DoesNotExist:
                 return Response({"error": _("User with this email does not exist!")}, status=status.HTTP_404_NOT_FOUND)
 """
 Handling the login view with Cookies and JWT decoding
@@ -132,8 +134,8 @@ class CookiesLoginView(APIView):
             payload = jwt.decode(token, 'secret', algorithms='HS256')
         except jwt.ExpiredSignatureError:
             raise AuthenticationFailed('Unauthenticated')
-        user = CustomUser.objects.filter(email=payload['user']).first()
-        serializer = UserSerializer(user)
+        user = User.objects.filter(email=payload['user']).first()
+        serializer = CustomUserSerializer(user)
         return Response(serializer.data, status = status.HTTP_200_OK)
 
 @api_view(['POST'])
@@ -168,9 +170,9 @@ def validate_authorization_code(request):
     if not response.ok:
         raise ValidationError('Failed to obtain user info from Google.')
     result = response.json()
-    login = CustomUser.objects.get(email=result['email'])
+    login = User.objects.get(email=result['email'])
     if login is None:
-        raise AuthenticationError("U ser with this email doesn't exist, kindly sign up")
+        raise AuthenticationError("User with this email doesn't exist, kindly sign up")
     return Response(result, status=status.HTTP_200_OK)
 
 
@@ -205,14 +207,15 @@ class Login(RestLoginView):
             if serializer.is_valid(raise_exception=True):
                 email = serializer.validated_data['email']
                 password = serializer.validated_data['password']
-                queryset = CustomUser.objects.get(email=email)
+                query = User.objects.filter(entry='Tenant')
+                queryset = query.objects.get(email=email)
                 if not queryset.check_password(password):
                     raise AuthenticationFailed("Incorrect Password")
                 elif queryset is None: 
                     raise AuthenticationFailed("User not found")        
                 return Response( status=status.HTTP_200_OK)  
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except CustomUser.DoesNotExist:
+        except User.DoesNotExist:
             return Response({"error": _("User with this email does not exist!")}, status=status.HTTP_404_NOT_FOUND)
 
 @api_view(["GET"])
@@ -222,7 +225,7 @@ def logout(request):
         logout(request)
         return Response({"success": _("Successfully logged out.")},
                     status=status.HTTP_200_OK)
-    except (AttributeError, CustomUser.DoesNotExist):
+    except (AttributeError, User.DoesNotExist):
         return Response ({"Error": _("User not found, enter a valid token.")},
         status=status.HTTP_404_NOT_FOUND)
 class LogoutView(APIView):

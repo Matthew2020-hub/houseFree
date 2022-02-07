@@ -28,4 +28,5 @@ urlpatterns = [
     path('rest-auth/registration/', include('rest_auth.registration.urls')),
     path('', include('transaction.urls')),
     path('', include('agentAuthentication.urls')),
+    path('', include('message.urls')),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

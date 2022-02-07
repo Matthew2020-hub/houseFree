@@ -11,7 +11,7 @@ from django.http.response import JsonResponse
 from django.shortcuts import render
 from .serializers import (AgentSerializer,AgentLoginSerializer, GetAcessTokenSerializer,
 CustomPasswordResetSerializer, SocialSerializer)
-from .models import Agent
+from userAuthentication.models import User
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers, viewsets
 from rest_framework.response import Response
@@ -19,7 +19,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework import generics
 from rest_framework import mixins
-from rest_framework.authentication import BasicAuthentication, SessionAuthentication, TokenAuthentication
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import generics
@@ -43,12 +43,12 @@ import urllib.parse
 """An endpoint to crreate user and to GET list of all users"""
 class CreateListAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins.CreateModelMixin):
     serializer_class = AgentSerializer
-    queryset = Agent.objects.all()
+    queryset = User.objects.filter(entry='Agent')
     lookup_field = 'email'
     authentication_classes = [TokenAuthentication]
     permisssion_classes = [IsAuthenticated]
     def get(self, request):
-        check = Agent.objects.all()
+        check = User.objects.filter(entry='Agent')
         return self.list(check)
     def post(self, request):
         return self.create(request)
@@ -56,29 +56,29 @@ class CreateListAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins.C
 """An endpoint to GET a specific user, Update user info and delete a user's record"""
 class CreateUpdateDestroyAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin):
     serializer_class = AgentSerializer
-    queryset = Agent.objects.all()
+    queryset = User.objects.filter(entry='Agent')
     lookup_field = 'user_id'
     authentication_classes = [TokenAuthentication]
     permisssion_classes = [IsAuthenticated]
     def get(self, request, user_id):
-        queryset = Agent.objects.filter(user_id = user_id)
+        queryset = User.objects.filter(user_id = user_id)
         article = get_object_or_404(queryset)
         serializer = AgentSerializer(article)
         return Response(serializer.data)
     def put(self, request, user_id):
-        query = Agent.objects.filter(user_id=user_id)
+        query = User.objects.filter(user_id=user_id)
         if query:
             return self.update(request)
         return Response(status=status.HTTP_401_UNAUTHORIZED)
     def delete(self, request, user_id):
-        query = Agent.objects.get(apartment_id=user_id)
+        query = User.objects.get(apartment_id=user_id)
         if query:
             return self.destroy(request)
 
 """A Custom Password reset view"""
 class CreateUpdateAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins.UpdateModelMixin):
     serializer_class = CustomPasswordResetSerializer
-    queryset = Agent.objects.all()
+    queryset = User.objects.filter(entry='Agent')
     lookup_field = 'user_id'
     authentication_classes = [TokenAuthentication]
     permisssion_classes = [IsAuthenticated]
@@ -89,7 +89,8 @@ class CreateUpdateAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins
             phone_number = serializer.validated_data['phone_number']
             password = serializer.validated_data['password']
             print(password)
-            query = Agent.objects.filter(email=email, phone_number=phone_number)
+            queryset = User.objects.filter(entry='Agent')
+            query = queryset.filter(email=email, phone_number=phone_number)
             if query:
                 print(password)
                 return self.update(request)
@@ -121,7 +122,7 @@ class SetLoginView(APIView):
                         'jwt': token
                     }           
                 return response
-            except Agent.DoesNotExist:
+            except User.DoesNotExist:
                 return Response({"error": _("User with this email does not exist!")}, status=status.HTTP_404_NOT_FOUND)
 """
 Handling the login view with Cookies and JWT decoding
@@ -135,8 +136,8 @@ class CookiesLoginView(APIView):
             payload = jwt.decode(token, 'secret', algorithms='HS256')
         except jwt.ExpiredSignatureError:
             raise AuthenticationFailed('Unauthenticated')
-        user = Agent.objects.filter(email=payload['user']).first()
-        serializer = Agent(user)
+        user = User.objects.filter(email=payload['user']).first()
+        serializer = User(user)
         return Response(serializer.data, status = status.HTTP_200_OK)
 
 @api_view(['POST'])
@@ -188,14 +189,14 @@ class Login(RestLoginView):
             if serializer.is_valid(raise_exception=True):
                 email = serializer.validated_data['email']
                 password = serializer.validated_data['password']
-                queryset = Agent.objects.get(email=email)
+                queryset = User.objects.get(email=email)
                 if not queryset.check_password(password):
                     raise AuthenticationFailed("Incorrect Password")
                 elif queryset is None: 
                     raise AuthenticationFailed("User not found")        
                 return Response( status=status.HTTP_200_OK)  
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except Agent.DoesNotExist:
+        except User.DoesNotExist:
             return Response({"error": _("User with this email does not exist!")}, status=status.HTTP_404_NOT_FOUND)
 
 @api_view(["GET"])
@@ -205,7 +206,7 @@ def logout(request):
         logout(request)
         return Response({"success": _("Successfully logged out.")},
                     status=status.HTTP_200_OK)
-    except (AttributeError, Agent.DoesNotExist):
+    except (AttributeError, User.DoesNotExist):
         return Response ({"Error": _("User not found, enter a valid token.")},
         status=status.HTTP_404_NOT_FOUND)
 class LogoutView(APIView):

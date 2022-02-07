@@ -1,19 +1,25 @@
+import email
+from email.policy import default
 from tkinter import CASCADE
 from django.db import models
 # Create your models here.
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import AbstractUser, UserManager
 from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
 import uuid
-# from .managers import CustomUserManager
-# , AgentManager
-# from django.contrib.auth.models import UserManager
-from django.contrib.auth.base_user import BaseUserManager
+from django.conf import settings
+# from django.contrib.auth.base_user import BaseUserManager, UserManager
+from cloudinary.models import CloudinaryField
+from .validators import minimum_amount
 
 
 
-class CustomUserManager(BaseUserManager):
+# from django.contrib.auth.base_user import BaseUserManager
+
+
+
+class CustomUserManager(UserManager):
     use_in_migrations = True
     """
     Custom user model manager where email is the unique identifiers
@@ -47,13 +53,19 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self.db)
         return user
 
-class CustomUser(AbstractBaseUser):
+class User(AbstractUser):
     username = None
+    USER_TYPE = [
+        ( 'Tenant', 'Tenant'),
+        ('Agent','Agent')
+    ]
+    entry = models.CharField(choices=USER_TYPE, max_length=10)
     email = models.EmailField(_('email address'), unique=True)
     user_id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, unique=True)
     first_name = models.CharField(null=True, max_length=30, verbose_name= 'First Name')
     last_name = models.CharField(null=True, max_length=30, verbose_name= 'Last Name')
     home_address = models.CharField( max_length=30, null=True, verbose_name= 'Home Address', blank=False)
+    balance = models.FloatField(default=0, validators=[minimum_amount, ])
     country = CountryField()
     phone_number = models.CharField(max_length=14, null=True, unique=True, verbose_name='phone number', blank=False)
     date_created = models.DateTimeField(auto_now_add=True)
@@ -77,3 +89,23 @@ class CustomUser(AbstractBaseUser):
 
 
 
+
+
+
+
+# class User(AbstractUser):
+  
+#     password = models.CharField(max_length=30, null=True)
+#     email = models.EmailField(_('email address'), unique=True, default=False)
+#     ID = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, unique=True)
+#     first_name = models.CharField(null=True, max_length=30, verbose_name= 'First Name')
+#     last_name = models.CharField(null=True, max_length=30, verbose_name= 'Last Name')
+#     home_address = models.CharField(null=True, max_length=30, verbose_name= 'Home Address')
+#     country = CountryField(default=False)
+#     phone_number = models.CharField(max_length=14, null=True, unique=True,  blank=False)
+#     date_created = models.DateTimeField(auto_now_add=True)
+
+#     def __str__(self):
+#         return self.first_name
+
+        

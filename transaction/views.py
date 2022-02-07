@@ -1,9 +1,12 @@
 from locale import currency
+from multiprocessing import AuthenticationError
 import re
 from unicodedata import name
 from django.forms import ValidationError
 from django.http import request
 from django.shortcuts import render
+
+from userAuthentication.models import User
 from .models import Payment, Wallet
 from .serializers import PaymentSerializer, WithdrawalSerializer, WalletSerializer
 from rest_framework.decorators import api_view
@@ -13,7 +16,7 @@ from random import randint
 from django.contrib.auth.decorators import login_required
 import environ
 import requests
-from dome.settings import FLUTTERWAVE_KEY, AUTH_AGENT_MODEL
+from dome.settings import FLUTTERWAVE_KEY
 from agentAuthentication.models import Agent
 # Initialise environment variables
 
@@ -34,8 +37,10 @@ def make_payment(request):
         phone = serializer.validated_data['phone']
         name = serializer.validated_data['name']
         agent_account_no = serializer.validated_data['agent_account_number']
-        verify_acct = Wallet.objects.filter(user=request.user)
+        query = User.objects.filter(entry='agent')
+        verify_acct = query.filter(user_id = agent_account_no)
         if verify_acct is not None:
+            print(verify_acct)
             verify_acct['balance'] += amount
             verify_acct.save()
             auth_token = FLUTTERWAVE_KEY
@@ -66,7 +71,7 @@ def make_payment(request):
             response_data = response.json()
             link=response_data['data']['link']
             return Response(link)
-        raise Wallet.DoesNotExist("Invalid agent's account details, try again!")
+        raise AuthenticationError('no valid user')
 
 @api_view(['GET','POST']) 
 def verify_transaction(transaction_id): 
@@ -98,7 +103,7 @@ def agent_withdrawal(request):
             return Response({'message':'Invalid Email input, enter the correct email!'}, status=status.HTTP_404_NOT_FOUND)
         if account_id is None:
             return Response({'message':'Incorrect Account ID!'}, status=status.HTTP_404_NOT_FOUND) 
-        if amount > Wallet.objects.get(user=AUTH_AGENT_MODEL)['balcance']:
+        if amount > Wallet.objects.get(user=Agent)['balcance']:
             raise ValueError("Insufficient fund")
         auth_token = FLUTTERWAVE_KEY
         header = {'Authorization': 'Bearer ' + auth_token}

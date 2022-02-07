@@ -129,10 +129,11 @@ INSTALLED_APPS = [
     'userAuthentication',
     'transaction',
     'agentAuthentication',
+    'message',
 ]
 
 REST_AUTH_SERIALIZERS = {
-    'USER_DETAILS_SERIALIZER': 'userAuthentication.serializers.UserSerializer',
+    'USER_DETAILS_SERIALIZER': 'userAuthentication.serializers.CustomUserSerializer',
     'AGENT_DETAILS_SERIALIZER': 'agentAuthentication.serializers.AgentSerializer',
     'LOGIN_SERIALIZER': 'userAuthentication.serializers.LoginUserSerializer',
 }
@@ -157,9 +158,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'dome.urls'
 
-AUTH_USER_MODEL = 'userAuthentication.CustomUser'
-AUTH_AGENT_MODEL = 'agentAuthentication.Agent'
-# AUTH_AGENT_MODEL = 'userAuthenticatin.Agent_info'
+AUTH_USER_MODEL = 'userAuthentication.User'
 
 TEMPLATES = [
     {
@@ -213,7 +212,11 @@ ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/?verification=1'
 
 SITE_ID = 1
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = '587'
+EMAIL_HOST_USER = 'housefree189@gmail.com'
+EMAIL_HOST_PASSWORD = 'respect1242'
+EMAIL_USE_TLS = True
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
