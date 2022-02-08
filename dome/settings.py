@@ -28,21 +28,11 @@ os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
 env = environ.Env()
 # reading .env file
-environ.Env.read_env('free.env')
-
+environ.Env.read_env('freeHouse.env')
+DEBUG = True
 # Raises django's ImproperlyConfigured exception if SECRET_KEY not in os.environ
 SECRET_KEY = env("SECRET_KEY")
 FLUTTERWAVE_KEY=env("FLUTTERWAVE_KEY")
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': env("DATABASE_NAME"),
-        'USER': env("DATABASE_USER"),
-        'PASSWORD': env("DATABASE_PASSWORD"),
-        'HOST': env("DATABASE_HOST"),
-        'PORT': env("DATABASE_PORT"),
-    }
-}
 cloudinary.config( 
   cloud_name=env("CLOUD_NAME"), 
   api_key=env("API_KEY"), 
@@ -99,7 +89,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': env("DATABASE_NAME"),
+        'USER': env("DATABASE_USER"),
+        'PASSWORD': env("DATABASE_PASSWORD"),
+        'HOST': env("DATABASE_HOST"),
+        'PORT': env("DATABASE_PORT"),
+    }
+}
 ALLOWED_HOSTS = ['localhost','127.0.0.1','house-free.herokuapp.com']
 # ALLOWED_HOSTS = []
 # Application definition
