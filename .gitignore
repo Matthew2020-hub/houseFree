@@ -164,8 +164,11 @@ cython_debug/
 *.log
 *.pot
 *.pyc
-.env
 __pycache__
+*.env
+__pycache__
+freeHouse.env
+transaction.env
 db.sqlite3
 /media
 local.env
