@@ -25,6 +25,8 @@ from decouple import config
 import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
@@ -110,6 +112,7 @@ ALLOWED_HOSTS = ['localhost','127.0.0.1','house-free.herokuapp.com']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
+    'whitenoise.runserver_nostatic'
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
