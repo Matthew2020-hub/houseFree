@@ -164,7 +164,7 @@ cython_debug/
 *.log
 *.pot
 *.pyc
-__pycache__
+*__pycache__
 *.env
 __pycache__
 freeHouse.env
