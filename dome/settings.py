@@ -9,13 +9,7 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-
-from distutils.debug import DEBUG
 from pathlib import Path
-
-import os
-from pickle import TRUE
-from tkinter.tix import Tree
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
@@ -23,13 +17,19 @@ from django.shortcuts import redirect
 import environ
 from decouple import config
 import os
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dome.settings")
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
 env = environ.Env()
 # reading .env file
 environ.Env.read_env('freeHouse.env')
-DEBUG = True
 # Raises django's ImproperlyConfigured exception if SECRET_KEY not in os.environ
 SECRET_KEY = env("SECRET_KEY")
 FLUTTERWAVE_KEY=env("FLUTTERWAVE_KEY")
@@ -76,6 +76,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSIONS_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
+    'NON_FIELD_ERROR_KEY': 'error'
 }
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -85,26 +86,27 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = 'django-insecure-0srq8vs)x)=#z5)wpj3h*mnwn&1%zk&#bci^_ftv#0io#sv5t7'
+SECRET_KEY = 'django-insecure-0srq8vs)x)=#z5)wpj3h*mnwn&1%zk&#bci^_ftv#0io#sv5t7'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': env('DATABASE_NAME'),
-        'USER': env('DATABASE_USER'),
-        'PASSWORD':env('DATABASE_PASSWORD'),
-        'HOST': env('DATABASE_HOST'),
-        'PORT': env('DATABASE_PORT'),
+        'NAME': env("DATABASE_NAME"),
+        'USER': env("DATABASE_USER"),
+        'PASSWORD': env("DATABASE_PASSWORD"),
+        'HOST': env("DATABASE_HOST"),
+        'PORT': env("DATABASE_PORT"),
     }
 }
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost','127.0.0.1','house-free.herokuapp.com']
 # ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
+    'whitenoise.runserver_nostatic'
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -232,9 +234,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
