@@ -24,6 +24,13 @@ class CustomUserSerializer(serializers.ModelSerializer):
                 'write_only':True
             },
         }
+    def validate(self, attrs):
+        email = attrs.get('email', '')
+        if not email.isalnum():
+            raise serializers.ValidationError(
+                'Email should only contain alphanumeric characters'
+            )
+            
     def save(self):
         user = User(
             email=self.validated_data['email'],

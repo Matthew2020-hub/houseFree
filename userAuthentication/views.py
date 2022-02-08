@@ -85,12 +85,11 @@ class CreateUpdateAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins
             email = serializer.validated_data['email']
             phone_number = serializer.validated_data['phone_number']
             password = serializer.validated_data['password']
-            print(password)
             queryset = User.objects.filter(entry='Tenant')
             query = queryset.filter(email=email, phone_number=phone_number)
             if query:
-                print(password)
-                return self.update(request)
+                serializer.save()
+                return self.update(password)
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 """
 Handling User's Login with Google session with JWT and setting cookies

@@ -1,25 +1,19 @@
 asgiref==3.4.1
-<<<<<<< HEAD
 cachetools==5.0.0
-=======
 backports.zoneinfo==0.2.1
->>>>>>> main
 certifi==2021.10.8
 cffi==1.15.0
 charset-normalizer==2.0.10
 cloudinary==1.28.1
 cryptography==36.0.1
 defusedxml==0.7.1
-<<<<<<< HEAD
 Deprecated==1.2.13
 Django==3.2.10
 django-allauth==0.47.0
 django-braces==1.15.0
-=======
 dj-rest-auth==2.2.2
 Django==4.0.1
 django-allauth==0.47.0
->>>>>>> main
 django-cloudinary-storage==0.3.0
 django-cors-headers==3.11.0
 django-countries==7.2.1
