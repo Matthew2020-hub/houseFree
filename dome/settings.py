@@ -23,6 +23,11 @@ from django.shortcuts import redirect
 import environ
 from decouple import config
 import os
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dome.settings")
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
@@ -88,7 +93,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECRET_KEY = 'django-insecure-0srq8vs)x)=#z5)wpj3h*mnwn&1%zk&#bci^_ftv#0io#sv5t7'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
