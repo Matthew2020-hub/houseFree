@@ -1,15 +1,18 @@
+from django.shortcuts import render
+from django.urls import reverse_lazy
+# Create your views here.
 from http.client import responses
-from lib2to3.pgen2 import token
 from multiprocessing import AuthenticationError
+from lib2to3.pgen2 import token
 from os import access
 import re
 from django.forms import ValidationError
 from django.http import request, response
 from django.http.response import JsonResponse
 from django.shortcuts import render
-from .serializers import (LoginUserSerializer, GetAcessTokenSerializer,
-CustomPasswordResetSerializer, SocialSerializer, CustomUserSerializer)
-from .models import User
+from .serializers import (AgentSerializer,AgentLoginSerializer, GetAcessTokenSerializer,
+CustomPasswordResetSerializer, SocialSerializer)
+from userAuthentication.models import User
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers, viewsets
 from rest_framework.response import Response
@@ -35,32 +38,33 @@ from rest_framework.response import Response
 import requests
 from rest_framework.exceptions import AuthenticationFailed
 import jwt, datetime
-from django.utils.http import unquote
+from urllib.parse import unquote
+import urllib.parse
 
 """An endpoint to crreate user and to GET list of all users"""
 class CreateListAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins.CreateModelMixin):
-    serializer_class = CustomUserSerializer
-    queryset = User.objects.filter(entry='Tenant')
+    serializer_class = AgentSerializer
+    queryset = User.objects.filter(entry='Agent')
     lookup_field = 'email'
     authentication_classes = [TokenAuthentication]
     permisssion_classes = [IsAuthenticated]
     def get(self, request):
-        check = User.objects.filter(entry='Tenant')
+        check = User.objects.filter(entry='Agent')
         return self.list(check)
     def post(self, request):
         return self.create(request)
 
 """An endpoint to GET a specific user, Update user info and delete a user's record"""
 class CreateUpdateDestroyAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin):
-    serializer_class =CustomUserSerializer
-    queryset =User.objects.filter(entry='Tenant')
+    serializer_class = AgentSerializer
+    queryset = User.objects.filter(entry='Agent')
     lookup_field = 'user_id'
     authentication_classes = [TokenAuthentication]
     permisssion_classes = [IsAuthenticated]
     def get(self, request, user_id):
         queryset = User.objects.filter(user_id = user_id)
         article = get_object_or_404(queryset)
-        serializer = CustomUserSerializer(article)
+        serializer = AgentSerializer(article)
         return Response(serializer.data)
     def put(self, request, user_id):
         query = User.objects.filter(user_id=user_id)
@@ -75,7 +79,7 @@ class CreateUpdateDestroyAPIView(generics.GenericAPIView, mixins.ListModelMixin,
 """A Custom Password reset view"""
 class CreateUpdateAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins.UpdateModelMixin):
     serializer_class = CustomPasswordResetSerializer
-    queryset = User.objects.filter(entry='Tenant')
+    queryset = User.objects.filter(entry='Agent')
     lookup_field = 'user_id'
     authentication_classes = [TokenAuthentication]
     permisssion_classes = [IsAuthenticated]
@@ -86,24 +90,23 @@ class CreateUpdateAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins
             phone_number = serializer.validated_data['phone_number']
             password = serializer.validated_data['password']
             print(password)
-            queryset = User.objects.filter(entry='Tenant')
+            queryset = User.objects.filter(entry='Agent')
             query = queryset.filter(email=email, phone_number=phone_number)
             if query:
                 print(password)
                 return self.update(request)
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 """
-Handling User's Login with Google session with JWT and setting cookies
+Handling Agent's Login with Google session with JWT and setting cookies
 """
 class SetLoginView(APIView):
         def post(self, request):
             try:
-                serializer = LoginUserSerializer(data=request.data)
+                serializer = AgentLoginSerializer(data=request.data)
                 if serializer.is_valid(raise_exception=True):
                     email = serializer.validated_data['email']
                     password = serializer.validated_data['password']
-                    query = User.objects.filter(entry='Tenant')
-                    queryset = query.objects.get(email=email)
+                    queryset = AgentLoginSerializer.objects.get(email=email)
                     if not queryset.check_password(password):
                         raise AuthenticationFailed("Incorrect Password")
                     elif queryset is None:
@@ -135,7 +138,7 @@ class CookiesLoginView(APIView):
         except jwt.ExpiredSignatureError:
             raise AuthenticationFailed('Unauthenticated')
         user = User.objects.filter(email=payload['user']).first()
-        serializer = CustomUserSerializer(user)
+        serializer = User(user)
         return Response(serializer.data, status = status.HTTP_200_OK)
 
 @api_view(['POST'])
@@ -170,21 +173,22 @@ def validate_authorization_code(request):
         raise AuthenticationError("User with this email doesn't exist, kindly sign up")
     return Response(result, status=status.HTTP_200_OK)
 
+
+
 """A manaual or Custom login and logout View without cookies.
 N.B: This is login view when user signs in manually, i.e., without google authentication
  """
 class Login(RestLoginView):
     authentication_classes = [TokenAuthentication]
     permisssion_classes = [IsAuthenticated]
-    serializer_class = LoginUserSerializer
+    serializer_class = AgentLoginSerializer
     def post(self, request, *args, **kwargs):
         try:
-            serializer = LoginUserSerializer(data=request.data)
+            serializer = AgentLoginSerializer(data=request.data)
             if serializer.is_valid(raise_exception=True):
                 email = serializer.validated_data['email']
                 password = serializer.validated_data['password']
-                query = User.objects.filter(entry='Tenant')
-                queryset = query.objects.get(email=email)
+                queryset = User.objects.get(email=email)
                 if not queryset.check_password(password):
                     raise AuthenticationFailed("Incorrect Password")
                 elif queryset is None: 
