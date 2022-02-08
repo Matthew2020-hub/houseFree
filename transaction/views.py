@@ -37,8 +37,8 @@ def make_payment(request):
         phone = serializer.validated_data['phone']
         name = serializer.validated_data['name']
         agent_account_no = serializer.validated_data['agent_account_number']
-        query = User.objects.filter(entry='agent')
-        verify_acct = query.filter(user_id = agent_account_no)
+        # query = User.objects.filter(entry='agent')
+        verify_acct = User.objects.get(user_id = agent_account_no)
         if verify_acct is not None:
             print(verify_acct)
             verify_acct['balance'] += amount

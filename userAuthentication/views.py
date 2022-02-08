@@ -144,9 +144,6 @@ def validate_authorization_code(request):
     if serializer.is_valid(raise_exception=True):
         code = serializer.validated_data['code']
         uncoded = unquote(code)
-        # coder = code.split()
-        # decode = coder[0:5].pop().insert[0:1, '/']
-        # uncoded = ''.join(decode)
         if code  is None:
             return Response({"message": "Error occured due to Invalid authorization code"}, status=status.HTTP_204_NO_CONTENT)
         data = {
@@ -158,7 +155,6 @@ def validate_authorization_code(request):
                 'grant_type': 'authorization_code'
         }
         response = requests.post('https://oauth2.googleapis.com/token', data=data)
-        print(data)
         if not response.ok:
             return Response({'message':'Failed to obtain access token from Google'}, status=status.HTTP_400_BAD_REQUEST)
         access_token = response.json()['access_token']
@@ -166,7 +162,6 @@ def validate_authorization_code(request):
         'https://www.googleapis.com/oauth2/v3/userinfo',
         params={'access_token': access_token}
     )
-    print(response)
     if not response.ok:
         raise ValidationError('Failed to obtain user info from Google.')
     result = response.json()
@@ -174,25 +169,6 @@ def validate_authorization_code(request):
     if login is None:
         raise AuthenticationError("User with this email doesn't exist, kindly sign up")
     return Response(result, status=status.HTTP_200_OK)
-
-
-@api_view(['GET', 'POST'])
-def google_get_user_info(request):
-    pass
-    # access_token = request.session.get('access_token')
-    # print(access_token)
-   
-    # serializer = SocialSerializer(data=request.data)
-    # if serializer.is_valid(raise_exception=True):
-        # access_token = serializer.validated_data['access_token']
-        # response = requests.get(
-        #     'https://www.googleapis.com/oauth2/v3/userinfo',
-        #     params={'access_token': access_token}
-        # )
-        # if not response.ok:
-        #     raise ValidationError('Failed to obtain user info from Google.')
-        # result = response.json()
-        # return Response(result, status=status.HTTP_200_OK)
 
 """A manaual or Custom login and logout View without cookies.
 N.B: This is login view when user signs in manually, i.e., without google authentication
