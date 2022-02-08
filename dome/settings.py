@@ -28,7 +28,7 @@ os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
 env = environ.Env()
 # reading .env file
-environ.Env.read_env('freeHouse.env')
+environ.Env.read_env('free.env')
 
 # Raises django's ImproperlyConfigured exception if SECRET_KEY not in os.environ
 SECRET_KEY = env("SECRET_KEY")
@@ -51,7 +51,7 @@ cloudinary.config(
 )
 SECRET_KEY = os.environ.get('DJANGO_KEY')
 CLOUDINARY_URL="cloudinary://313926842933816:DSBYok2TOrxqZjMKrEp8nNM_OcA@housefree"
-
+# DEBUG=True
 # Facebook configuration
 
 SOCIAL_AUTH_GOOGLE_KEY = env('GOOGLE_CLIENT_ID')
@@ -101,7 +101,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = True
 
 ALLOWED_HOSTS = ['house-free.herokuapp.com', '127.0.0.1', 'localhost']
-
+# ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
