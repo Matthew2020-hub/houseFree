@@ -33,11 +33,11 @@ CLOUDINARY_URL="cloudinary://313926842933816:DSBYok2TOrxqZjMKrEp8nNM_OcA@housefr
 # DEBUG=True
 # Facebook configuration
 
-SOCIAL_AUTH_GOOGLE_KEY = env('GOOGLE_CLIENT_ID')
-SOCIAL_AUTH_GOOGLE_SECRET = env('GOOGLE_CLIENT_KEY')
-FLUTTERWAVE_KEY= env('FLUTTER_WAVE')
-redirect_uri = env('redirect_uri')
-project_id = env('project_id')
+SOCIAL_AUTH_GOOGLE_KEY = os.environ.get('GOOGLE_CLIENT_ID')
+SOCIAL_AUTH_GOOGLE_SECRET =os.environ.get('GOOGLE_CLIENT_KEY')
+FLUTTERWAVE_KEY= os.environ.get('FLUTTER_WAVE')
+redirect_uri = os.environ.get('redirect_uri')
+project_id = os.environ.get('project_id')
 
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
 
