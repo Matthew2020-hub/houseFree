@@ -23,7 +23,7 @@ from django.shortcuts import redirect
 import environ
 from decouple import config
 import os
-
+DEBUG = True
 BASE_DIR = Path(__file__).resolve().parent.parent
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
@@ -45,7 +45,7 @@ cloudinary.config(
   api_secret=env("API_SECRET"),
   secure = True
 )
-SECRET_KEY = os.environ.get('DJANGO_KEY')
+# SECRET_KEY = os.environ.get('DJANGO_KEY')
 CLOUDINARY_URL="cloudinary://313926842933816:DSBYok2TOrxqZjMKrEp8nNM_OcA@housefree"
 # DEBUG=True
 # Facebook configuration
@@ -259,3 +259,5 @@ CORS_ORIGIN_ALLOW_ALL =True
 CORS_ALLOW_CREDENTIALS =True
 from django.urls import reverse_lazy
 LOGIN_URL = reverse_lazy('agent-login')
+
+

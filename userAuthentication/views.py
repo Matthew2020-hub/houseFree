@@ -35,6 +35,7 @@ from rest_framework.response import Response
 import requests
 from rest_framework.exceptions import AuthenticationFailed
 import jwt, datetime
+from jwt import RefreshToken
 from django.utils.http import unquote
 
 """An endpoint to crreate user and to GET list of all users"""

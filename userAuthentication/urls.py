@@ -17,10 +17,8 @@ urlpatterns = [
     path('api/v1/user/cookies/', CookiesLoginView.as_view()),
     path('api/v1/user/access-token/', views.validate_authorization_code, name="code_validation"),
     path('rest-auth/logout/', views.logout, name="logout"),
-    # path('soc/', include('rest_framework_social_oauth2.urls')),
     path('rest-auth/forget_password/<uuid:user_id>', CreateUpdateAPIView.as_view()),
     path('rest-auth/registration/<uuid:user_id>', CreateUpdateDestroyAPIView.as_view()),
-    path('', include('rest_auth.urls')),
     path('views/<uuid:user_id>', CreateUpdateDestroyAPIView.as_view()),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
