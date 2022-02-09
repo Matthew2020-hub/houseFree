@@ -38,7 +38,7 @@ cloudinary.config(
   api_secret=env("API_SECRET"),
   secure = True
 )
-# SECRET_KEY = os.environ.get('DJANGO_KEY')
+SECRET_KEY = env('SECRET_KEY')
 CLOUDINARY_URL="cloudinary://313926842933816:DSBYok2TOrxqZjMKrEp8nNM_OcA@housefree"
 # DEBUG=True
 # Facebook configuration
@@ -85,7 +85,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-0srq8vs)x)=#z5)wpj3h*mnwn&1%zk&#bci^_ftv#0io#sv5t7'
+# SECRET_KEY = 'django-insecure-0srq8vs)x)=#z5)wpj3h*mnwn&1%zk&#bci^_ftv#0io#sv5t7'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
@@ -101,7 +101,7 @@ DATABASES = {
         'PORT': env("DATABASE_PORT"),
     }
 }
-ALLOWED_HOSTS = ['localhost','127.0.0.1','house-free.herokuapp.com']
+ALLOWED_HOSTS = ['house-free.herokuapp.com','localhost','127.0.0.1']
 # ALLOWED_HOSTS = []
 # Application definition
 
