@@ -31,7 +31,7 @@ env = environ.Env()
 environ.Env.read_env('freeHouse.env')
 # Raises django's ImproperlyConfigured exception if SECRET_KEY not in os.environ
 # SECRET_KEY = env("SECRET_KEY")
-FLUTTERWAVE_KEY=env("FLUTTER_WAVE")
+
 cloudinary.config( 
   cloud_name=env("CLOUD_NAME"), 
   api_key=env("API_KEY"), 
@@ -45,6 +45,7 @@ CLOUDINARY_URL="cloudinary://313926842933816:DSBYok2TOrxqZjMKrEp8nNM_OcA@housefr
 
 SOCIAL_AUTH_GOOGLE_KEY = env('GOOGLE_CLIENT_ID')
 SOCIAL_AUTH_GOOGLE_SECRET = env('GOOGLE_CLIENT_KEY')
+FLUTTERWAVE_KEY= env('FLUTTER_WAVE')
 redirect_uri = env('redirect_uri')
 project_id = env('project_id')
 
