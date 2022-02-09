@@ -1,7 +1,6 @@
 from dataclasses import fields
 from django.forms import CharField, models
 from django.shortcuts import redirect
-# from .models import Agent
 import requests
 from rest_framework import serializers
 from django_countries.fields import CountryField
@@ -10,7 +9,6 @@ from userAuthentication.models import User
 
 class AgentSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(style={'input_type':'password'}, write_only=True)
-    # entry = serializers.ChoiceField(choices='tenant')
     class Meta:
         model = User
         fields = ['email', 'entry', 'password', 'first_name', 'last_name', 'country', 'password2', 'phone_number', 'home_address', 'user_id']

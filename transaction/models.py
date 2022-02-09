@@ -14,10 +14,3 @@ class Payment(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     amount = models.CharField(max_length=40, blank=False)
     agent_account_number = models.CharField(max_length=150, blank=False)
-    
-# class Wallet(models.Model):
-#     user = models.OneToOneField(User, on_delete=models.CASCADE)
-#     balance = models.FloatField(default=0, validators=[minimum_amount, ])
-
-#     def __str__(self):
-#         return f"{self.user.email}'s Wallet"

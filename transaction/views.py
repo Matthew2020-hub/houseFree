@@ -5,7 +5,6 @@ from unicodedata import name
 from django.forms import ValidationError
 from django.http import request
 from django.shortcuts import render
-
 from userAuthentication.models import User
 from .models import Payment
 from .serializers import PaymentSerializer, WithdrawalSerializer
@@ -17,14 +16,6 @@ from django.contrib.auth.decorators import login_required
 import environ
 import requests
 from dome.settings import FLUTTERWAVE_KEY
-# from agentAuthentication.models import Agent
-# Initialise environment variables
-
-
-# @api_view(['GET', 'POST'])
-# def wallet(request):
-#     queryset = Wallet.objects.all()
-#     serializer = WalletSerializer(data=request.data)
 
 
 @api_view(['GET', 'POST'])
