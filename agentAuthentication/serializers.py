@@ -1,7 +1,7 @@
 from dataclasses import fields
 from django.forms import CharField, models
 from django.shortcuts import redirect
-from .models import Agent
+# from .models import Agent
 import requests
 from rest_framework import serializers
 from django_countries.fields import CountryField

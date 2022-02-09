@@ -106,7 +106,6 @@ ALLOWED_HOSTS = ['localhost','127.0.0.1','house-free.herokuapp.com']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
-    'whitenoise.runserver_nostatic'
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
