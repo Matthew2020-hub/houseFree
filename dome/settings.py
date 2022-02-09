@@ -30,7 +30,7 @@ env = environ.Env()
 # reading .env file
 environ.Env.read_env('freeHouse.env')
 # Raises django's ImproperlyConfigured exception if SECRET_KEY not in os.environ
-SECRET_KEY = env("SECRET_KEY")
+# SECRET_KEY = env("SECRET_KEY")
 FLUTTERWAVE_KEY=env("FLUTTERWAVE_KEY")
 cloudinary.config( 
   cloud_name=env("CLOUD_NAME"), 
@@ -38,7 +38,7 @@ cloudinary.config(
   api_secret=env("API_SECRET"),
   secure = True
 )
-SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = os.environ.get('DJANGO_KEY')
 CLOUDINARY_URL="cloudinary://313926842933816:DSBYok2TOrxqZjMKrEp8nNM_OcA@housefree"
 # DEBUG=True
 # Facebook configuration
