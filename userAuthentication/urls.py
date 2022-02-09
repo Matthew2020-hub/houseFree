@@ -8,7 +8,7 @@ from allauth.account.views import confirm_email
 from  .views import (CreateListAPIView, Login, 
 CreateUpdateDestroyAPIView,CreateUpdateAPIView, LogoutView, SetLoginView, CookiesLoginView)
 from dome.settings import AUTHENTICATION_BACKENDS
-
+# amen
 urlpatterns = [
     path('api/v1/user/registration/', CreateListAPIView.as_view()),
     path('api/v1/user/login/', Login.as_view()),
