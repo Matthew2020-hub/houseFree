@@ -17,6 +17,11 @@ from django.shortcuts import redirect
 import environ
 from decouple import config
 import os
+
+
+
+
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
@@ -99,7 +104,11 @@ DATABASES = {
         'PORT': os.environ.get('DATABASE_PORT'),
     }
 }
-ALLOWED_HOSTS = ['localhost','127.0.0.1','house-free.herokuapp.com']
+# aa
+# import dj_database_url
+# db_from_env = dj_database_url.config(conn_max_age=500)
+# DATABASES['default'].update(db_from_env)
+ALLOWED_HOSTS = ['localhost','127.0.0.1','freehouses.herokuapp.com']
 # ALLOWED_HOSTS = []
 # Application definition
 

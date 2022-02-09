@@ -17,7 +17,7 @@ urlpatterns = [
     path('api/v1/agent/logout/', LogoutView.as_view()),
     path('api/v1/agent/jwt-cookie/', CookiesLoginView.as_view()),
     path('api/v1/agent/access-tokens/', views.validate_authorization_code, name="code_validation"),
-    path('rest-auth/logout/', views.logout, name="logout"),
+    path('rest_auth/logout/', views.logout, name="logout"),
     path('api/v1/agent/forget-password/<uuid:user_id>', CreateUpdateAPIView.as_view()),
     path('', include('rest_auth.urls')),
     path('agent-view/<uuid:user_id>', CreateUpdateDestroyAPIView.as_view()),

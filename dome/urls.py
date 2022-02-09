@@ -23,7 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('apartment.urls')),
     path('', include('userAuthentication.urls')),
-    path('', include('rest_auth.urls')),
+    # path('', include('rest_auth.urls')),
     path('api/v1/auth', include('rest_framework_social_oauth2.urls')),
     path('accounts/', include('allauth.urls')),
     path('rest-auth/registration/', include('rest_auth.registration.urls')),
