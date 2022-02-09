@@ -38,7 +38,7 @@ cloudinary.config(
   api_secret=env("API_SECRET"),
   secure = True
 )
-SECRET_KEY = env('SECRET_KEY')
+SECRET_KEY = os.environ.get('SECRET_KEY')
 CLOUDINARY_URL="cloudinary://313926842933816:DSBYok2TOrxqZjMKrEp8nNM_OcA@housefree"
 # DEBUG=True
 # Facebook configuration
@@ -101,7 +101,7 @@ DATABASES = {
         'PORT': env("DATABASE_PORT"),
     }
 }
-ALLOWED_HOSTS = ['house-free.herokuapp.com','localhost','127.0.0.1']
+ALLOWED_HOSTS = ['localhost','127.0.0.1','house-free.herokuapp.com']
 # ALLOWED_HOSTS = []
 # Application definition
 
