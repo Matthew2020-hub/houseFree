@@ -33,11 +33,12 @@ environ.Env.read_env('freeHouse.env')
 # SECRET_KEY = env("SECRET_KEY")
 
 cloudinary.config( 
-  cloud_name=env("CLOUD_NAME"), 
-  api_key=env("API_KEY"), 
-  api_secret=env("API_SECRET"),
+  cloud_name= env('CLOUD_NAME'), 
+  api_key= env('API_KEY'), 
+  api_secret= env('API_SECRET'),
   secure = True
 )
+
 SECRET_KEY = os.environ.get('DJANGO_KEY')
 CLOUDINARY_URL="cloudinary://313926842933816:DSBYok2TOrxqZjMKrEp8nNM_OcA@housefree"
 # DEBUG=True
