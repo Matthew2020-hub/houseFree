@@ -7,8 +7,8 @@ from django.http import request
 from django.shortcuts import render
 
 from userAuthentication.models import User
-from .models import Payment, Wallet
-from .serializers import PaymentSerializer, WithdrawalSerializer, WalletSerializer
+from .models import Payment
+from .serializers import PaymentSerializer, WithdrawalSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -17,7 +17,7 @@ from django.contrib.auth.decorators import login_required
 import environ
 import requests
 from dome.settings import FLUTTERWAVE_KEY
-from agentAuthentication.models import Agent
+# from agentAuthentication.models import Agent
 # Initialise environment variables
 
 
@@ -97,13 +97,13 @@ def agent_withdrawal(request):
         amount = serializer.validated_data['amount']
         debit_currency = serializer.validated_data['debit_currency']
         acct_id = serializer.validated_data['account_id']
-        account_id = Wallet.objects.filter(account_id=acct_id)
-        email_verify = Agent.objects.filter(email=email)
+        account_id = User.objects.filter(account_id=acct_id)
+        email_verify = User.objects.filter(email=email)
         if email_verify is None:
             return Response({'message':'Invalid Email input, enter the correct email!'}, status=status.HTTP_404_NOT_FOUND)
         if account_id is None:
             return Response({'message':'Incorrect Account ID!'}, status=status.HTTP_404_NOT_FOUND) 
-        if amount > Wallet.objects.get(user=Agent)['balcance']:
+        if amount > User.objects.get(user=User)['balcance']:
             raise ValueError("Insufficient fund")
         auth_token = FLUTTERWAVE_KEY
         header = {'Authorization': 'Bearer ' + auth_token}
@@ -127,7 +127,7 @@ def agent_withdrawal(request):
 def dashboard(request):
     
     print(request.user)
-    wallet_balance = Wallet.objects.get(user=request.user).balance
+    wallet_balance = User.objects.get(user=request.user).balance
     if not wallet_balance is None:
         print(request.user)
         context = {

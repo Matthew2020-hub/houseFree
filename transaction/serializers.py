@@ -2,15 +2,15 @@ from dataclasses import fields
 import email
 from email.policy import default
 from django.forms import models
-from .models import Payment, Wallet
+from .models import Payment
 import uuid
 from rest_framework import serializers
 
 
-class WalletSerializer(serializers.ModelSerializer):
-    class Meta:
-        models = Wallet
-        fields = "__all__"
+# class WalletSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         models = 
+#         fields = "__all__"
         
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:

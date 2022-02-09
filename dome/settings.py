@@ -9,13 +9,7 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-
-from distutils.debug import DEBUG
 from pathlib import Path
-
-import os
-from pickle import TRUE
-from tkinter.tix import Tree
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
@@ -23,7 +17,6 @@ from django.shortcuts import redirect
 import environ
 from decouple import config
 import os
-DEBUG = True
 BASE_DIR = Path(__file__).resolve().parent.parent
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
@@ -96,7 +89,7 @@ SECRET_KEY = 'django-insecure-0srq8vs)x)=#z5)wpj3h*mnwn&1%zk&#bci^_ftv#0io#sv5t7
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-DEBUG = True
+DEBUG = False
 
 DATABASES = {
     'default': {
@@ -114,7 +107,6 @@ ALLOWED_HOSTS = ['localhost','127.0.0.1','house-free.herokuapp.com']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
-    'whitenoise.runserver_nostatic'
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
