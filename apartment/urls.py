@@ -5,6 +5,8 @@ from .views import CreateListAPIView, CreateUpdateDestroyAPIView
 from django.conf import settings
 from django.conf.urls.static import static
 
+# adjacent
+
 urlpatterns = [
     # path('views/', CreateListAPIView.as_view()),
     # path('views/<uuid:apartment_id>', CreateUpdateDestroyAPIView.as_view())
