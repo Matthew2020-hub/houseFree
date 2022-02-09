@@ -27,16 +27,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dome.settings")
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
 env = environ.Env()
-# reading .env file
 environ.Env.read_env('freeHouse.env')
-# Raises django's ImproperlyConfigured exception if SECRET_KEY not in os.environ
-# SECRET_KEY = env("SECRET_KEY")
- 
-cloud_name = 'housefree'
-api_key = env('API_KEY') 
-api_secret = env('API_SECRET')
-secure = True
-
 SECRET_KEY = os.environ.get('DJANGO_KEY')
 CLOUDINARY_URL="cloudinary://313926842933816:DSBYok2TOrxqZjMKrEp8nNM_OcA@housefree"
 # DEBUG=True
@@ -49,6 +40,13 @@ redirect_uri = env('redirect_uri')
 project_id = env('project_id')
 
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
+
+cloudinary.config( 
+  cloud_name = 'housefree', 
+  api_key = os.environ.get('API_KEY'), 
+  api_secret = os.environ.get('API_SECRET'),
+  secure = True
+)
 
 # Define SOCIAL_AUTH_FACEBOOK_SCOPE to get extra permissions from facebook. Email is not sent by default, to get it, you must request the email permission:
 FACEBOOK_EXTENDED_PERMISSIONS = ['email']
